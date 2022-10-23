@@ -24,6 +24,6 @@ class Question(models.Model):
 
 class KeyQuestion(models.Model):
     graded_exam = models.ForeignKey(ExamGroup, on_delete=models.CASCADE)
-    key_class = models.CharField()
+    key_class = models.CharField(max_length=1)
     number = models.CharField(max_length=3)
-    choice = models.CharField()
+    choice = models.CharField(max_length=1)
