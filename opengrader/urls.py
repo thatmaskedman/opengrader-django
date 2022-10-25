@@ -19,7 +19,7 @@ from rest_framework import routers
 from opengrader_backend import views
 
 router = routers.DefaultRouter()
-router.register(r'examgroup', views.ExamGroupViewSet)
+router.register(r'/examgroup', views.ExamGroupViewSet)
 
 urlpatterns = [
     path('api', include(router.urls)),
