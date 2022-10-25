@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from models import ExamGroup
+from .models import ExamGroup
 from rest_framework import viewsets
 from rest_framework import permissions
 from opengrader_backend.serializers import ExamGroupSerializer 
