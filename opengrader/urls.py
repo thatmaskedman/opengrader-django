@@ -20,7 +20,7 @@ from opengrader_backend import views
 
 router = routers.DefaultRouter()
 router.register(r'examgroup', views.ExamGroupViewSet)
-router.register(r'exam', views.ExamGroupViewSet)
+router.register(r'exam', views.GradedExamViewSet)
 
 
 urlpatterns = [
