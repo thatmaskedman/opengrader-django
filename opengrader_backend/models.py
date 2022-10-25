@@ -1,4 +1,3 @@
-from unittest.util import _MAX_LENGTH
 from django.db import models
 
 class ExamGroup(models.Model):
@@ -21,6 +20,7 @@ class Question(models.Model):
     chosen = models.CharField(max_length=1)
     filled = models.BooleanField()
     correct = models.BooleanField()
+    threshold = models.FloatField()
 
 class KeyQuestion(models.Model):
     graded_exam = models.ForeignKey(ExamGroup, on_delete=models.CASCADE)
