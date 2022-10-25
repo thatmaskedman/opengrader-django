@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from models import ExamGroup, GradedExam, Question, KeyQuestion
+from .models import ExamGroup, GradedExam, Question, KeyQuestion
 from rest_framework import serializers
 
 class ExamGroupSerializer(serializers.HyperlinkedModelSerializer):
