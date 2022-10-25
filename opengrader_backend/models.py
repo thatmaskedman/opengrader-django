@@ -1,6 +1,8 @@
+from unittest.util import _MAX_LENGTH
 from django.db import models
 
 class ExamGroup(models.Model):
+    name = models.CharField(max_length=40)
     avg_group_grade = models.FloatField()
     date = models.DateField()
 
