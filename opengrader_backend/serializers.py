@@ -5,7 +5,7 @@ from rest_framework import serializers
 class ExamGroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ExamGroup
-        fields = ['avg_group_grade', 'date']
+        fields = ('avg_group_grade', 'date')
 
 
 class GradedExamSerializer(serializers.HyperlinkedModelSerializer):

@@ -2,6 +2,7 @@ from django.db import models
 
 class ExamGroup(models.Model):
     avg_group_grade = models.FloatField()
+    date = models.DateField()
 
 class GradedExam(models.Model):
     name = models.CharField(max_length=40)
