@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from .models import ExamGroup, GradedExam, Question, KeyQuestion
+from .models import ExamGroup, GradedExam, KeySheet, Question, KeyQuestion
 from rest_framework import serializers
 
 class ExamGroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -16,11 +16,12 @@ class GradedExamSerializer(serializers.HyperlinkedModelSerializer):
             'name_blob',
             'control_number',
             'control_number_blob',
-            'key_letter',
             'correct_answers',
             'wrong_answers',
             'grade',
+            'is_graded',
             'exam_group',
+            'key_sheet'
         )
 
 
@@ -29,14 +30,19 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
         model = Question
         fields = (
             'graded_exam',
+            'number',
             'chosen', 
             'filled', 
             'correct',
             'threshold',
         )
 
+class KeyQuestionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = KeyQuestion
+        fields = ('key_sheet','number', 'chosen')
 
-# class KeyQuestion(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = KeyQuestion
-#         fields = ('name','avg_group_grade', 'date')
+class KeySheetSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = KeySheet
+        fields = ('exam_group','key_class')
