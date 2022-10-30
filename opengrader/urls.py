@@ -21,6 +21,10 @@ from opengrader_backend import views
 router = routers.DefaultRouter()
 router.register(r'examgroup', views.ExamGroupViewSet)
 router.register(r'exam', views.GradedExamViewSet)
+router.register(r'question', views.QuestionExamViewSet)
+router.register(r'keysheet', views.KeySheetViewSet)
+router.register(r'keyquestion', views.KeyQuestionViewSet)
+
 
 
 urlpatterns = [
