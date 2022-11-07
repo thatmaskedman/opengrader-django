@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-wch!#8*z@$nybftit@n+#r64i0_w5_ns14p!ac38n%@8x+96+0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework'
+    'rest_framework',
+    'opengrader_backend'
 ]
 
 MIDDLEWARE = [
