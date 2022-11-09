@@ -2,20 +2,25 @@ from django.contrib.auth.models import User
 from .models import ExamGroup, GradedExam, KeySheet, Question, KeyQuestion
 from rest_framework import serializers
 
-class ExamGroupSerializer(serializers.HyperlinkedModelSerializer):
+
+class ExamGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExamGroup
-        fields = ('name','avg_group_grade', 'date')
+        fields = (
+            'id',
+            'name',
+            'avg_group_grade', 
+            'date'
+        )
 
-
-class GradedExamSerializer(serializers.HyperlinkedModelSerializer):
+class GradedExamSerializer(serializers.ModelSerializer):
     class Meta:
         model = GradedExam
         fields = (
+            'id',
             'name',
             'name_blob',
             'control_number',
-            'control_number_blob',
             'correct_answers',
             'wrong_answers',
             'grade',
@@ -24,25 +29,40 @@ class GradedExamSerializer(serializers.HyperlinkedModelSerializer):
             'key_sheet'
         )
 
-
-class QuestionSerializer(serializers.HyperlinkedModelSerializer):
+class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = (
+            'id',
             'graded_exam',
-            'number',
-            'chosen', 
+            'num',
+            'chosen',
+            'state', 
             'filled', 
             'correct',
             'threshold',
         )
 
-class KeyQuestionSerializer(serializers.HyperlinkedModelSerializer):
+class BulkKeyQuestionSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        key_questions_data = [
+            KeyQuestion(**item) for item in validated_data
+        ]
+
+        return KeyQuestion.objects.bulk_create(key_questions_data)
+
+class KeyQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = KeyQuestion
-        fields = ('key_sheet','number', 'chosen')
+        fields = (
+            'id',
+            'key_sheet',
+            'number', 
+            'chosen'
+        )
+        list_serializer_class = BulkKeyQuestionSerializer
 
-class KeySheetSerializer(serializers.HyperlinkedModelSerializer):
+class KeySheetSerializer(serializers.ModelSerializer):
     class Meta:
         model = KeySheet
-        fields = ('exam_group','key_class')
+        fields = ('id', 'exam_group','key_class')
