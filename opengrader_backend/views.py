@@ -1,11 +1,24 @@
 from django.shortcuts import render
 from .models import ExamGroup, GradedExam, KeyQuestion, KeySheet, Question
 from rest_framework import viewsets
+from rest_framework import views
 from rest_framework import permissions
+from rest_framework.response import Response
+from rest_framework import status
+
 from opengrader_backend.serializers import ( 
-    ExamGroupSerializer, GradedExamSerializer, QuestionSerializer,
-    KeySheetSerializer, KeyQuestionSerializer
+    ExamGroupSerializer, 
+    GradedExamSerializer, 
+    QuestionSerializer, 
+    KeySheetSerializer, 
+    KeyQuestionSerializer
 )
+
+class FileUploadView(views.APIView):
+    def put(self, request, filename, format=None):
+        f = request.data['file']
+        return Response(status=204)
+
 
 class ExamGroupViewSet(viewsets.ModelViewSet):
     """
