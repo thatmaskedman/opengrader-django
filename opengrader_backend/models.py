@@ -18,6 +18,7 @@ CHOICES = [
 
 class ExamGroup(models.Model):
     name = models.CharField(max_length=40)
+    num_questions = models.IntegerField()
     avg_group_grade = models.FloatField(default=0.0)
     date = models.DateField()
 
@@ -28,6 +29,7 @@ class KeySheet(models.Model):
         choices=CHOICES,
         default=LETTER_NONE,
     )
+
 
 class GradedExam(models.Model):
     name = models.CharField(max_length=40)
@@ -42,16 +44,33 @@ class GradedExam(models.Model):
     key_sheet = models.ForeignKey(KeySheet, on_delete=models.CASCADE)
 
 class Question(models.Model):
+    STATES = [
+        ('', 'Empty'),
+        ('correct ', 'Correct'),
+        ('wrong', 'Ambiguous'),
+        ('ambiguous', 'Ambiguous')
+    ]
+
     graded_exam = models.ForeignKey(GradedExam, on_delete=models.CASCADE)
-    number = models.CharField(max_length=3)
+    num = models.CharField(max_length=3)
     chosen = models.CharField(
         max_length=1,
         choices=CHOICES,
         default=LETTER_NONE,
     )
-    filled = models.BooleanField(default=False)
     correct = models.BooleanField(default=False)
+    state = models.CharField(
+        max_length=10,
+        choices=STATES,
+        default='emtpy'
+    )
     threshold = models.FloatField(default=0.0)
+    a_filled = models.BooleanField(default=False)
+    b_filled = models.BooleanField(default=False)
+    c_filled = models.BooleanField(default=False)
+    d_filled = models.BooleanField(default=False)
+    e_filled = models.BooleanField(default=False)
+    
 
 class KeyQuestion(models.Model):
     key_sheet = models.ForeignKey(KeySheet, on_delete=models.CASCADE)
