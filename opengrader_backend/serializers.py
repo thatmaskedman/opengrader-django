@@ -6,44 +6,19 @@ from rest_framework import serializers
 class ExamGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExamGroup
-        fields = (
-            'id',
-            'name',
-            'avg_group_grade', 
-            'date'
-        )
+        fields = '__all__'
 
 class GradedExamSerializer(serializers.ModelSerializer):
     class Meta:
         model = GradedExam
-        fields = (
-            'id',
-            'name',
-            'name_blob',
-            'control_number',
-            'correct_answers',
-            'wrong_answers',
-            'grade',
-            'is_graded',
-            'exam_group',
-            'key_sheet'
-        )
+        fields = '__all__'
 
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
-        fields = (
-            'id',
-            'graded_exam',
-            'num',
-            'chosen',
-            'state', 
-            'filled', 
-            'correct',
-            'threshold',
-        )
+        fields = '__all__'
 
-class BulkKeyQuestionSerializer(serializers.ModelSerializer):
+class BulkKeyQuestionSerializer(serializers.ListSerializer):
     def create(self, validated_data):
         key_questions_data = [
             KeyQuestion(**item) for item in validated_data
@@ -54,15 +29,10 @@ class BulkKeyQuestionSerializer(serializers.ModelSerializer):
 class KeyQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = KeyQuestion
-        fields = (
-            'id',
-            'key_sheet',
-            'number', 
-            'chosen'
-        )
+        fields = '__all__'
         list_serializer_class = BulkKeyQuestionSerializer
 
 class KeySheetSerializer(serializers.ModelSerializer):
     class Meta:
         model = KeySheet
-        fields = ('id', 'exam_group','key_class')
+        fields = '__all__'
