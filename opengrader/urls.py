@@ -25,11 +25,11 @@ from rest_framework_simplejwt.views import (
 
 
 router = routers.DefaultRouter()
-router.register(r'examgroup', views.ExamGroupViewSet)
-router.register(r'exam', views.GradedExamViewSet)
-router.register(r'question', views.QuestionExamViewSet)
-router.register(r'keysheet', views.KeySheetViewSet)
-router.register(r'keyquestion', views.KeyQuestionViewSet)
+router.register(r'examgroups', views.ExamGroupViewSet)
+router.register(r'exams', views.GradedExamViewSet)
+router.register(r'questions', views.QuestionExamViewSet)
+router.register(r'keysheets', views.KeySheetViewSet)
+router.register(r'keyquestions', views.KeyQuestionViewSet)
 
 
 urlpatterns = [
