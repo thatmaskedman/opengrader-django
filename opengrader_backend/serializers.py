@@ -8,15 +8,31 @@ class ExamGroupSerializer(serializers.ModelSerializer):
         model = ExamGroup
         fields = '__all__'
 
-class GradedExamSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = GradedExam
-        fields = '__all__'
+
 
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = '__all__'
+        
+class GradedExamSerializer(serializers.ModelSerializer):
+    questions = QuestionSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = GradedExam
+        fields = (
+            'id',
+            'questions',
+            'exam_group',
+            'key_sheet', 
+            'name',
+            'control_number',
+            'control_number_blob',
+            'correct_answers',
+            'wrong_answers',
+            'is_graded',
+        )
+
 
 class BulkKeyQuestionSerializer(serializers.ListSerializer):
     def create(self, validated_data):
