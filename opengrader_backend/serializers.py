@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
-from .models import ExamGroup, GradedExam, KeySheet, Question, KeyQuestion
+from .models import ExamGroup, Exam, KeySheet, Question, KeyQuestion
 from rest_framework import serializers
+from rest_framework import generics
 
 
 class ExamGroupSerializer(serializers.ModelSerializer):
@@ -10,16 +11,27 @@ class ExamGroupSerializer(serializers.ModelSerializer):
 
 
 
+class BulkQuestionSerializer(serializers.ListSerializer):
+    def create(self, validated_data):
+        questions_data = [
+            Question(**item) for item in validated_data
+        ]
+
+        return KeyQuestion.objects.bulk_create(questions_data)
+
+
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = '__all__'
+        list_serializer_class = BulkQuestionSerializer
         
+
 class GradedExamSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
     
     class Meta:
-        model = GradedExam
+        model = Exam
         fields = (
             'id',
             'questions',
@@ -27,7 +39,7 @@ class GradedExamSerializer(serializers.ModelSerializer):
             'key_sheet', 
             'name',
             'control_number',
-            'control_number_blob',
+            'file_uuid',
             'correct_answers',
             'wrong_answers',
             'is_graded',
@@ -42,11 +54,13 @@ class BulkKeyQuestionSerializer(serializers.ListSerializer):
 
         return KeyQuestion.objects.bulk_create(key_questions_data)
 
+
 class KeyQuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = KeyQuestion
         fields = '__all__'
-        list_serializer_class = BulkKeyQuestionSerializer
+        list_serializer_class = BulkKeyQuestionSerializer 
+        
 
 class KeySheetSerializer(serializers.ModelSerializer):
     class Meta:
