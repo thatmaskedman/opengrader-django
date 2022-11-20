@@ -1,4 +1,6 @@
+import uuid
 from django.db import models
+
 
 LETTER_A = 'a'
 LETTER_B = 'b'
@@ -23,6 +25,9 @@ class ExamGroup(models.Model):
     avg_group_grade = models.FloatField(default=0.0)
     date = models.DateField()
 
+    def __str__(self):
+        return self.name
+
 
 class KeySheet(models.Model):
     exam_group = models.ForeignKey(ExamGroup, on_delete=models.CASCADE)
@@ -32,8 +37,11 @@ class KeySheet(models.Model):
         default=LETTER_NONE,
     )
 
+    def __str__(self):
+        return str(self.exam_group)
 
-class GradedExam(models.Model):
+
+class Exam(models.Model):
     exam_group = models.ForeignKey(ExamGroup, on_delete=models.CASCADE)
     key_sheet = models.ForeignKey(KeySheet, on_delete=models.CASCADE)
     STATES = [
@@ -45,7 +53,7 @@ class GradedExam(models.Model):
 
     name = models.CharField(max_length=40)
     control_number = models.CharField(max_length=10)
-    control_number_blob = models.BinaryField()
+    file_uuid = models.UUIDField(default=uuid.uuid4)
     state = models.CharField(
         max_length=10,
         choices=STATES,
@@ -56,10 +64,12 @@ class GradedExam(models.Model):
     is_graded = models.BooleanField(default=False)
     grade = models.FloatField(default=0.0)
 
+    def __str__(self):
+        return self.state
 
 class Question(models.Model):
-    graded_exam = models.ForeignKey(GradedExam, related_name='questions', on_delete=models.CASCADE)
-    num = models.IntegerField()
+    graded_exam = models.ForeignKey(Exam, related_name='questions', on_delete=models.CASCADE)
+    number = models.IntegerField()
     chosen = models.CharField(
         max_length=1,
         choices=CHOICES,
