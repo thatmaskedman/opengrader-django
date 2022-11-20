@@ -1,8 +1,9 @@
 from django.shortcuts import render
-from .models import ExamGroup, GradedExam, KeyQuestion, KeySheet, Question
+from .models import ExamGroup, Exam, KeyQuestion, KeySheet, Question
 from rest_framework import viewsets
 from rest_framework import views
 from rest_framework import permissions
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -11,7 +12,8 @@ from opengrader_backend.serializers import (
     GradedExamSerializer, 
     QuestionSerializer, 
     KeySheetSerializer, 
-    KeyQuestionSerializer
+    KeyQuestionSerializer,
+    BulkKeyQuestionSerializer
 )
 
 class FileUploadView(views.APIView):
@@ -32,7 +34,7 @@ class GradedExamViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows to be viewed or edited.
     """
-    queryset = GradedExam.objects.all()
+    queryset = Exam.objects.all()
     serializer_class = GradedExamSerializer
 
     
@@ -58,3 +60,10 @@ class KeyQuestionViewSet(viewsets.ModelViewSet):
     """
     queryset = KeyQuestion.objects.all()
     serializer_class = KeyQuestionSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
