@@ -22,8 +22,6 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-
-
 router = routers.DefaultRouter()
 router.register(r'examgroups', views.ExamGroupViewSet)
 router.register(r'exams', views.GradedExamViewSet)
