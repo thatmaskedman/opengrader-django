@@ -24,7 +24,7 @@ class FileUploadView(views.APIView):
 
 class ExamGroupViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    API endpoint of an Exam group
     """
     queryset = ExamGroup.objects.all()
     serializer_class = ExamGroupSerializer
@@ -44,6 +44,13 @@ class QuestionExamViewSet(viewsets.ModelViewSet):
     """
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class KeySheetViewSet(viewsets.ModelViewSet):

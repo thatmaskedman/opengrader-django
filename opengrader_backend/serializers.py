@@ -10,14 +10,13 @@ class ExamGroupSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class BulkQuestionSerializer(serializers.ListSerializer):
     def create(self, validated_data):
         questions_data = [
             Question(**item) for item in validated_data
         ]
 
-        return KeyQuestion.objects.bulk_create(questions_data)
+        return Question.objects.bulk_create(questions_data)
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -63,6 +62,7 @@ class KeyQuestionSerializer(serializers.ModelSerializer):
         
 
 class KeySheetSerializer(serializers.ModelSerializer):
+    key_questions = KeyQuestionSerializer(many=True, read_only=True)
     class Meta:
         model = KeySheet
         fields = '__all__'
