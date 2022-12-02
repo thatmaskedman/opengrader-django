@@ -65,7 +65,7 @@ class Exam(models.Model):
     grade = models.FloatField(default=0.0)
 
     def __str__(self):
-        return self.state
+        return self.name
 
 class Question(models.Model):
     graded_exam = models.ForeignKey(Exam, related_name='questions', on_delete=models.CASCADE)
@@ -76,7 +76,11 @@ class Question(models.Model):
         default=LETTER_NONE,
     )
     correct = models.BooleanField(default=False)
-    threshold = models.FloatField(default=0.0)
+    a_thresh = models.FloatField(default=0.0)
+    b_thresh = models.FloatField(default=0.0)
+    c_thresh = models.FloatField(default=0.0)
+    d_thresh = models.FloatField(default=0.0)
+    e_thresh = models.FloatField(default=0.0)
     a_filled = models.BooleanField(default=False)
     b_filled = models.BooleanField(default=False)
     c_filled = models.BooleanField(default=False)
