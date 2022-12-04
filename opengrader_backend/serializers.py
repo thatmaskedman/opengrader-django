@@ -24,11 +24,11 @@ class QuestionSerializer(serializers.ModelSerializer):
         model = Question
         fields = '__all__'
         list_serializer_class = BulkQuestionSerializer
-        
+
 
 class GradedExamSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
-    
+
     class Meta:
         model = Exam
         fields = (
@@ -59,7 +59,7 @@ class KeyQuestionSerializer(serializers.ModelSerializer):
         model = KeyQuestion
         fields = '__all__'
         list_serializer_class = BulkKeyQuestionSerializer 
-        
+
 
 class KeySheetSerializer(serializers.ModelSerializer):
     key_questions = KeyQuestionSerializer(many=True, read_only=True)
