@@ -1,7 +1,7 @@
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from .models import ExamGroup, Exam, KeySheet, Question, KeyQuestion
 from rest_framework import serializers
-from rest_framework import generics
+# from rest_framework import generics
 
 
 class ExamGroupSerializer(serializers.ModelSerializer):
@@ -24,11 +24,11 @@ class QuestionSerializer(serializers.ModelSerializer):
         model = Question
         fields = '__all__'
         list_serializer_class = BulkQuestionSerializer
-        
+
 
 class GradedExamSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
-    
+
     class Meta:
         model = Exam
         fields = (
@@ -59,10 +59,11 @@ class KeyQuestionSerializer(serializers.ModelSerializer):
         model = KeyQuestion
         fields = '__all__'
         list_serializer_class = BulkKeyQuestionSerializer 
-        
+
 
 class KeySheetSerializer(serializers.ModelSerializer):
     key_questions = KeyQuestionSerializer(many=True, read_only=True)
+    
     class Meta:
         model = KeySheet
         fields = '__all__'

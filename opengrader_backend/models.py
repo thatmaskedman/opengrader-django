@@ -67,8 +67,13 @@ class Exam(models.Model):
     def __str__(self):
         return self.name
 
+
 class Question(models.Model):
-    graded_exam = models.ForeignKey(Exam, related_name='questions', on_delete=models.CASCADE)
+    graded_exam = models.ForeignKey(
+        Exam,
+        related_name='questions', 
+        on_delete=models.CASCADE)
+
     number = models.IntegerField()
     chosen = models.CharField(
         max_length=1,
@@ -87,14 +92,19 @@ class Question(models.Model):
     d_filled = models.BooleanField(default=False)
     e_filled = models.BooleanField(default=False)
 
+
 class KeyQuestion(models.Model):
-    key_sheet = models.ForeignKey(KeySheet, related_name='key_questions', on_delete=models.CASCADE)
+    key_sheet = models.ForeignKey(
+        KeySheet,
+        related_name='key_questions',
+        on_delete=models.CASCADE)
+
     number = models.IntegerField()
     chosen = models.CharField(
         max_length=1,
         choices=CHOICES,
         default=LETTER_NONE,
     )
-    
+
     def __str__(self):
         return ''
