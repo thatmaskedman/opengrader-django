@@ -95,8 +95,8 @@ class Question(models.Model):
 
 class KeyQuestion(models.Model):
     key_sheet = models.ForeignKey(
-        KeySheet, 
-        related_name='key_questions', 
+        KeySheet,
+        related_name='key_questions',
         on_delete=models.CASCADE)
 
     number = models.IntegerField()
@@ -105,6 +105,6 @@ class KeyQuestion(models.Model):
         choices=CHOICES,
         default=LETTER_NONE,
     )
-    
+
     def __str__(self):
         return ''
