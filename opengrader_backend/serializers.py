@@ -1,7 +1,7 @@
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from .models import ExamGroup, Exam, KeySheet, Question, KeyQuestion
 from rest_framework import serializers
-from rest_framework import generics
+# from rest_framework import generics
 
 
 class ExamGroupSerializer(serializers.ModelSerializer):
@@ -63,6 +63,7 @@ class KeyQuestionSerializer(serializers.ModelSerializer):
 
 class KeySheetSerializer(serializers.ModelSerializer):
     key_questions = KeyQuestionSerializer(many=True, read_only=True)
+    
     class Meta:
         model = KeySheet
         fields = '__all__'
