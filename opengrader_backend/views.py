@@ -1,9 +1,9 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 from .models import ExamGroup, Exam, KeyQuestion, KeySheet, Question
 from rest_framework import viewsets
 from rest_framework import views
-from rest_framework import permissions
-from rest_framework import generics
+# from rest_framework import permissions
+# from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -13,8 +13,8 @@ from opengrader_backend.serializers import (
     QuestionSerializer, 
     KeySheetSerializer, 
     KeyQuestionSerializer,
-    BulkKeyQuestionSerializer
 )
+
 
 class FileUploadView(views.APIView):
     def put(self, request, filename, format=None):
