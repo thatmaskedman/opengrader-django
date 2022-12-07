@@ -7,18 +7,19 @@ from rest_framework import views
 from rest_framework.response import Response
 from rest_framework import status
 
-from opengrader_backend.serializers import ( 
-    ExamGroupSerializer, 
-    GradedExamSerializer, 
-    QuestionSerializer, 
-    KeySheetSerializer, 
+from opengrader_backend.serializers import (
+    ExamGroupSerializer,
+    GradedExamSerializer,
+    QuestionSerializer,
+    KeySheetSerializer,
     KeyQuestionSerializer,
 )
 
 
-class FileUploadView(views.APIView):
+class ExamUploadView(views.APIView):
     def put(self, request, filename, format=None):
         f = request.data['file']
+        print(request.query_params)
         return Response(status=204)
 
 
@@ -37,7 +38,7 @@ class GradedExamViewSet(viewsets.ModelViewSet):
     queryset = Exam.objects.all()
     serializer_class = GradedExamSerializer
 
-    
+
 class QuestionExamViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
