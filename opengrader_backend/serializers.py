@@ -35,7 +35,8 @@ class GradedExamSerializer(serializers.ModelSerializer):
             'id',
             'questions',
             'exam_group',
-            'key_sheet', 
+            'exam_image',
+            'key_sheet',
             'name',
             'control_number',
             'file_uuid',
@@ -63,7 +64,7 @@ class KeyQuestionSerializer(serializers.ModelSerializer):
 
 class KeySheetSerializer(serializers.ModelSerializer):
     key_questions = KeyQuestionSerializer(many=True, read_only=True)
-    
+   
     class Meta:
         model = KeySheet
         fields = '__all__'
