@@ -59,6 +59,7 @@ class Exam(models.Model):
         choices=STATES,
         default='emtpy'
     )
+    exam_image = models.FileField(upload_to='exams/', default=None)
     correct_answers = models.IntegerField(default=0)
     wrong_answers = models.IntegerField(default=0)
     is_graded = models.BooleanField(default=False)
