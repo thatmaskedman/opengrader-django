@@ -49,7 +49,7 @@ class GradedExamViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
-    @action(detail=True, name='Set Answers')
+    @action(detail=True, methods=['put'], name='Grade Current Exam')
     def grade(self, request, pk=None):
         exam: Exam = self.get_object()
         serializer: GradedExamSerializer = self.get_serializer()
