@@ -42,6 +42,7 @@ class GradedExamSerializer(serializers.ModelSerializer):
             'file_uuid',
             'correct_answers',
             'wrong_answers',
+            'grade',
             'is_graded',
         )
 
