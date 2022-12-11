@@ -5,6 +5,8 @@ from rest_framework import views
 # from rest_framework import permissions
 # from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework.decorators import action
+
 from rest_framework import status
 
 from opengrader_backend.serializers import (
@@ -38,6 +40,25 @@ class GradedExamViewSet(viewsets.ModelViewSet):
     queryset = Exam.objects.all()
     serializer_class = GradedExamSerializer
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    @action(detail=True, name='Set Answers')
+    def grade(self, request, pk=None):
+        exam: Exam = self.get_object()
+        serializer: GradedExamSerializer = self.get_serializer()
+        headers = self.get_success_headers(serializer.data)
+    
+        exam.parse_questions()
+
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED, headers=headers)
+         
 
 class QuestionExamViewSet(viewsets.ModelViewSet):
     """
