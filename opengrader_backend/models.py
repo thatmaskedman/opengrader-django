@@ -68,14 +68,15 @@ class Exam(models.Model):
         choices=STATES,
         default='emtpy'
     )
-    exam_image = models.FileField(upload_to='exams', default=None)
+    exam_image_original = models.FileField(upload_to='exams/original', default=None)
+    exam_image_graded = models.FileField(upload_to='exams/graded', default=None)
     correct_answers = models.IntegerField(default=0)
     wrong_answers = models.IntegerField(default=0)
     is_graded = models.BooleanField(default=False)
     grade = models.FloatField(default=0.0)
     
     def parse_questions(self):
-        exam_bytes = io.BytesIO(self.exam_image.open(mode='rb').read())
+        exam_bytes = io.BytesIO(self.exam_image_original.open(mode='rb').read())
         processor = document.DocumentProcessor(exam_bytes)
         processor.process()
         choice_points = processor.get_choice_points()
@@ -111,26 +112,29 @@ class Exam(models.Model):
         exam_parser.grade_data()
 
         graded_questions = [Question(graded_exam=self, **fields) for fields in exam_parser.question_data]
-
+        Question.objects.filter(graded_exam=self).delete()
         Question.objects.bulk_create(graded_questions)
 
         exam_parser.mark_choices()
         _, graded_exam_nparray = cv.imencode('.jpg', exam_parser.img)
-        
-        self.exam_image.delete()
-        self.exam_image.save(
+        self.exam_image_graded.delete()
+        self.exam_image_graded.save(
             f'{self.file_uuid}.jpg',
             ContentFile(graded_exam_nparray.tobytes())
         )
+
+        
+        correct_num = len(list(filter(lambda q: q['correct'], exam_parser.question_data)))
+        self.correct_answers = correct_num
+        self.wrong_answers = exam_group.num_questions - correct_num 
+        self.grade = self.correct_answers / exam_group.num_questions
+        self.save()
 
     # Members.objects.all().order_by('firstname').values()
         # parsed_questions = [Question(**fields) for fields in exam_parser.question_data]
         # parsed_questions
     
     def set_choices(self):
-        pass
-
-    def grade(self):
         pass
 
     # def save(self, *args, **kwargs):
