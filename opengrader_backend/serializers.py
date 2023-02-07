@@ -1,7 +1,8 @@
 # from django.contrib.auth.models import User
 from .models import ExamGroup, Exam, KeySheet, Question, KeyQuestion
 from rest_framework import serializers
-# from rest_framework import generics
+from rest_pandas import PandasSerializer
+import pandas as pd
 
 
 class ExamGroupSerializer(serializers.ModelSerializer):
@@ -45,6 +46,53 @@ class GradedExamSerializer(serializers.ModelSerializer):
             'wrong_answers',
             'grade',
             'is_graded',
+        )
+
+
+class QuestionPandasSerializer(PandasSerializer):
+    def transform_dataframe(self, dataframe: pd.DataFrame):
+        exam_dataframe = dataframe.pivot(index='number', columns='graded_exam')
+        exam_dataframe = exam_dataframe.droplevel(level=0, axis=1)
+        exam_dataframe['avg'] = exam_dataframe.mean(axis=1)
+        return exam_dataframe
+
+
+class GradePandasSerializer(PandasSerializer):
+    def transform_dataframe(self, dataframe: pd.DataFrame):
+        exam_dataframe = dataframe.pivot(index='number', columns='graded_exam')
+        # exam_dataframe['avg'] = exam_dataframe.mean(axis=1)
+        exam_dataframe = exam_dataframe.droplevel(level=0, axis=1)
+        exam_dataframe = exam_dataframe.transpose()
+        exam_dataframe['sum'] = exam_dataframe.sum(axis=1)
+        return exam_dataframe
+
+
+class ChosenPandasSerializer(PandasSerializer):
+    def transform_dataframe(self, dataframe: pd.DataFrame):
+        exam_dataframe = dataframe.pivot_table(index='number', columns='chosen', aggfunc=pd.Series.nunique, fill_value=0)
+        exam_dataframe = exam_dataframe.droplevel(level=0, axis=1)
+        return exam_dataframe
+
+
+class ChosenDataFrameSerializer(serializers.ModelSerializer):
+    graded_exam = serializers.SlugRelatedField(read_only=True, slug_field='name')
+    class Meta:
+        model = Question
+        fields = (
+            'graded_exam',
+            'number',
+            'chosen'
+        )
+
+
+class QuestionDataFrameSerializer(serializers.ModelSerializer):
+    graded_exam = serializers.SlugRelatedField(read_only=True, slug_field='name')
+    class Meta:
+        model = Question
+        fields = (
+            'graded_exam',
+            'number',
+            'correct'
         )
 
 
