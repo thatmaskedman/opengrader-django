@@ -1,5 +1,6 @@
 # from django.shortcuts import render
 from .models import ExamGroup, Exam, KeyQuestion, KeySheet, Question
+from rest_pandas import PandasView
 from rest_framework import viewsets
 from rest_framework import views
 # from rest_framework import permissions
@@ -10,8 +11,13 @@ from rest_framework.decorators import action
 from rest_framework import status
 
 from opengrader_backend.serializers import (
+    ChosenDataFrameSerializer,
+    ChosenPandasSerializer,
     ExamGroupSerializer,
+    GradePandasSerializer,
     GradedExamSerializer,
+    QuestionDataFrameSerializer,
+    QuestionPandasSerializer,
     QuestionSerializer,
     KeySheetSerializer,
     KeyQuestionSerializer,
@@ -39,6 +45,15 @@ class GradedExamViewSet(viewsets.ModelViewSet):
     """
     queryset = Exam.objects.all()
     serializer_class = GradedExamSerializer
+
+    def get_queryset(self):
+        queryset = Exam.objects.all()
+        examgroup_pk = self.request.query_params.get('examgroup')
+        if examgroup_pk is not None:
+            examgroup = ExamGroup.objects.get(pk=examgroup_pk)
+            queryset = queryset.filter(exam_group=examgroup)
+        
+        return queryset
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -82,6 +97,15 @@ class KeySheetViewSet(viewsets.ModelViewSet):
     queryset = KeySheet.objects.all()
     serializer_class = KeySheetSerializer
 
+    def get_queryset(self):
+        queryset = KeySheet.objects.all()
+        examgroup_pk = self.request.query_params.get('examgroup')
+        if examgroup_pk is not None:
+            examgroup = ExamGroup.objects.get(pk=examgroup_pk)
+            queryset = queryset.filter(exam_group=examgroup)
+        
+        return queryset
+
 
 class KeyQuestionViewSet(viewsets.ModelViewSet):
     """
@@ -96,3 +120,43 @@ class KeyQuestionViewSet(viewsets.ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class ExamDataView(PandasView):
+    queryset = Question.objects.none()
+
+    def get_queryset(self): 
+        examgroup_pk = self.kwargs['examgroup']
+        examgroup = ExamGroup.objects.get(pk=examgroup_pk)
+        exams = Exam.objects.filter(exam_group=examgroup)
+        return Question.objects.filter(graded_exam__in=exams)
+
+
+    serializer_class = QuestionDataFrameSerializer
+    pandas_serializer_class = QuestionPandasSerializer
+
+class ChosenDataView(PandasView):
+    queryset = Question.objects.none()
+
+    def get_queryset(self): 
+        examgroup_pk = self.kwargs['examgroup']
+        keysheet = KeySheet.objects.get(pk=examgroup_pk)
+        exams = Exam.objects.filter(key_sheet=keysheet)
+        return Question.objects.filter(graded_exam__in=exams)
+
+
+    serializer_class = ChosenDataFrameSerializer
+    pandas_serializer_class = ChosenPandasSerializer
+
+class GradedDataView(PandasView):
+    queryset = Question.objects.none()
+
+    def get_queryset(self): 
+            examgroup_pk = self.kwargs['examgroup']
+            examgroup = ExamGroup.objects.get(pk=examgroup_pk)
+            exams = Exam.objects.filter(exam_group=examgroup)
+            return Question.objects.filter(graded_exam__in=exams)
+
+
+    serializer_class = QuestionDataFrameSerializer
+    pandas_serializer_class = GradePandasSerializer
