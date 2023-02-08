@@ -34,6 +34,9 @@ router.register(r'keyquestions', views.KeyQuestionViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
+    re_path('api/examdata/(?P<examgroup>.+)/$', views.ExamDataView.as_view()),
+    re_path('api/chosendata/(?P<examgroup>.+)/$', views.ChosenDataView.as_view()),
+    re_path('api/gradedata/(?P<examgroup>.+)/$', views.GradedDataView.as_view()),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     re_path(r'^upload/(?P<filename>[^/]+)$', views.ExamUploadView.as_view()),
