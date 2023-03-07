@@ -69,6 +69,7 @@ class Exam(models.Model):
         default='emtpy'
     )
     exam_image_original = models.FileField(upload_to='exams/original', default=None)
+    exam_image_grid = models.FileField(upload_to='exams/grid', default=None)
     exam_image_graded = models.FileField(upload_to='exams/graded', default=None)
     correct_answers = models.IntegerField(default=0)
     wrong_answers = models.IntegerField(default=0)
@@ -79,6 +80,9 @@ class Exam(models.Model):
         exam_bytes = io.BytesIO(self.exam_image_original.open(mode='rb').read())
         processor = document.DocumentProcessor(exam_bytes)
         processor.process()
+        
+        points = processor.get_choice_points()
+        
         choice_points = processor.get_choice_points()
         intensities = processor.get_intensities()
 
@@ -116,13 +120,12 @@ class Exam(models.Model):
         Question.objects.bulk_create(graded_questions)
 
         exam_parser.mark_choices()
-        _, graded_exam_nparray = cv.imencode('.jpg', exam_parser.img)
+        _, graded_exam_nparray = cv.imencode('.jpg', processor.img_scaled_marked_boxes)
         self.exam_image_graded.delete()
         self.exam_image_graded.save(
             f'{self.file_uuid}.jpg',
             ContentFile(graded_exam_nparray.tobytes())
         )
-
         
         correct_num = len(list(filter(lambda q: q['correct'], exam_parser.question_data)))
         self.correct_answers = correct_num
