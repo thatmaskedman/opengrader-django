@@ -1,8 +1,11 @@
 # from django.shortcuts import render
-from .models import ExamGroup, Exam, KeyQuestion, KeySheet, Question
+import pandas as pd
+from .models import ExamGroup, Exam, KeyQuestion, KeySheet, Question, Student
 from rest_pandas import PandasView
 from rest_framework import viewsets
 from rest_framework import views
+from rest_framework.decorators import parser_classes
+from rest_framework.parsers import MultiPartParser
 # from rest_framework import permissions
 # from rest_framework import generics
 from rest_framework.response import Response
@@ -21,6 +24,7 @@ from opengrader_backend.serializers import (
     QuestionSerializer,
     KeySheetSerializer,
     KeyQuestionSerializer,
+    StudentSerializer,
 )
 
 
@@ -108,6 +112,14 @@ class KeySheetViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(exam_group=examgroup)
         
         return queryset
+    
+
+class StudentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
 
 
 class KeyQuestionViewSet(viewsets.ModelViewSet):
@@ -161,3 +173,19 @@ class GradedDataView(PandasView):
 
     serializer_class = QuestionDataFrameSerializer
     pandas_serializer_class = GradePandasSerializer
+
+
+class FileUploadView(views.APIView):
+    parser_classes = [MultiPartParser]
+
+    def post(self, request, format=None):
+        file_obj = request.data['file']
+        exam_group_pk = request.data['examgroup']
+        df = pd.read_excel(file_obj)
+        print(df)
+        Student.objects.bulk_create((
+            Student(name=row['name'], control_number=row['control_num'], exam_group=ExamGroup(pk=exam_group_pk))
+            for _, row in df.iterrows()
+        ))
+
+        return Response(status=204)
