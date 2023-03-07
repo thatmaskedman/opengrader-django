@@ -1,5 +1,5 @@
 # from django.contrib.auth.models import User
-from .models import ExamGroup, Exam, KeySheet, Question, KeyQuestion
+from .models import ExamGroup, Exam, KeySheet, Question, KeyQuestion, Student
 from rest_framework import serializers
 from rest_pandas import PandasSerializer
 import pandas as pd
@@ -27,6 +27,12 @@ class QuestionSerializer(serializers.ModelSerializer):
         list_serializer_class = BulkQuestionSerializer
 
 
+class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = '__all__'
+
+
 class GradedExamSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
 
@@ -39,6 +45,7 @@ class GradedExamSerializer(serializers.ModelSerializer):
             'exam_image_original',
             'exam_image_graded',
             'key_sheet',
+            'student',
             'name',
             'control_number',
             'file_uuid',
