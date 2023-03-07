@@ -69,10 +69,13 @@ class GradedExamViewSet(viewsets.ModelViewSet):
         exam: Exam = self.get_object()
         serializer: GradedExamSerializer = self.get_serializer()
         headers = self.get_success_headers(serializer.data)
-    
-        exam.parse_questions()
 
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED, headers=headers)
+        try: 
+            exam.parse_questions()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED, headers=headers)
+        
+        except ValueError:
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST, headers=headers)
          
 
 class QuestionExamViewSet(viewsets.ModelViewSet):
@@ -131,7 +134,6 @@ class ExamDataView(PandasView):
         exams = Exam.objects.filter(exam_group=examgroup)
         return Question.objects.filter(graded_exam__in=exams)
 
-
     serializer_class = QuestionDataFrameSerializer
     pandas_serializer_class = QuestionPandasSerializer
 
@@ -152,11 +154,10 @@ class GradedDataView(PandasView):
     queryset = Question.objects.none()
 
     def get_queryset(self): 
-            examgroup_pk = self.kwargs['examgroup']
-            examgroup = ExamGroup.objects.get(pk=examgroup_pk)
-            exams = Exam.objects.filter(exam_group=examgroup)
-            return Question.objects.filter(graded_exam__in=exams)
-
+        examgroup_pk = self.kwargs['examgroup']
+        examgroup = ExamGroup.objects.get(pk=examgroup_pk)
+        exams = Exam.objects.filter(exam_group=examgroup)
+        return Question.objects.filter(graded_exam__in=exams)
 
     serializer_class = QuestionDataFrameSerializer
     pandas_serializer_class = GradePandasSerializer
