@@ -48,11 +48,18 @@ class KeySheet(models.Model):
     def __str__(self):
         return str(self.exam_group)
 
+class Student(models.Model):
+    exam_group = models.ForeignKey(ExamGroup, on_delete=models.CASCADE)
+    name = models.CharField(max_length=40)
+    control_number = models.CharField(max_length=10)
+
+    def __str__(self):
+        return str(self.name)
 
 class Exam(models.Model):
-
     exam_group = models.ForeignKey(ExamGroup, on_delete=models.CASCADE)
     key_sheet = models.ForeignKey(KeySheet, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
     STATES = [
         ('', 'Empty'),
         ('ambigous', 'Ambiguous'),
