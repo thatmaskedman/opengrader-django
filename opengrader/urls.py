@@ -30,6 +30,7 @@ router.register(r'exams', views.GradedExamViewSet)
 router.register(r'questions', views.QuestionExamViewSet)
 router.register(r'keysheets', views.KeySheetViewSet)
 router.register(r'keyquestions', views.KeyQuestionViewSet)
+router.register(r'students', views.StudentViewSet)
 
 
 urlpatterns = [
@@ -39,7 +40,8 @@ urlpatterns = [
     re_path('api/gradedata/(?P<examgroup>.+)/$', views.GradedDataView.as_view()),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    re_path(r'^upload/(?P<filename>[^/]+)$', views.ExamUploadView.as_view()),
+    # re_path(r'^upload/(?P<filename>[^/]+)$', views.ExamUploadView.as_view()),
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path(r'api/upload/', views.FileUploadView.as_view())
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
