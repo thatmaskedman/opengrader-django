@@ -47,6 +47,15 @@ class KeySheet(models.Model):
 
     def __str__(self):
         return str(self.exam_group)
+    
+    def initialize(self):
+        num_questions = \
+            ExamGroup.objects.filter(pk=self.exam_group).first().num_questions
+        
+        KeyQuestion.objects.bulk_create([
+            KeyQuestion(key_sheet=self, number=n, chosen='a')
+            for n in range(1, num_questions+1)
+        ])
 
 class Student(models.Model):
     exam_group = models.ForeignKey(ExamGroup, on_delete=models.CASCADE)
@@ -67,13 +76,13 @@ class Exam(models.Model):
         ('graded ', 'Graded'),
     ]
 
-    name = models.CharField(max_length=40)
-    control_number = models.CharField(max_length=10)
-    file_uuid = models.UUIDField(default=uuid.uuid4)
+    marked_uuid = models.UUIDField(default=uuid.uuid4)
+    graded_uuid = models.UUIDField(default=uuid.uuid4)
+
     state = models.CharField(
         max_length=10,
         choices=STATES,
-        default='emtpy'
+        default='empty'
     )
     exam_image_original = models.FileField(upload_to='exams/original', default=None)
     exam_image_grid = models.FileField(upload_to='exams/grid', default=None)
@@ -81,15 +90,13 @@ class Exam(models.Model):
     correct_answers = models.IntegerField(default=0)
     wrong_answers = models.IntegerField(default=0)
     is_graded = models.BooleanField(default=False)
-    grade = models.FloatField(default=0.0)
+    grade = models.FloatField(default=0.0,)
     
     def parse_questions(self):
         exam_bytes = io.BytesIO(self.exam_image_original.open(mode='rb').read())
         processor = document.DocumentProcessor(exam_bytes)
         processor.process()
-        
-        points = processor.get_choice_points()
-        
+                
         choice_points = processor.get_choice_points()
         intensities = processor.get_intensities()
 
@@ -100,8 +107,7 @@ class Exam(models.Model):
                 choice_points, 
                 thresholds=intensities,
                 question_count=exam_group.num_questions,
-                name=self.name,
-                control_num=self.control_number)
+            )
         
         exam_parser.set_data()
         exam_parser.choose_answers()
@@ -121,16 +127,24 @@ class Exam(models.Model):
 
         exam_parser.set_keydata(key_data)
         exam_parser.grade_data()
+        exam_parser.mark_choices()
 
         graded_questions = [Question(graded_exam=self, **fields) for fields in exam_parser.question_data]
         Question.objects.filter(graded_exam=self).delete()
         Question.objects.bulk_create(graded_questions)
 
-        exam_parser.mark_choices()
-        _, graded_exam_nparray = cv.imencode('.jpg', processor.img_scaled_marked_boxes)
+        _, marked_exam_nparray = cv.imencode('.jpg', processor.img_scaled_marked_boxes)
+        
+        self.exam_image_grid.delete()
+        self.exam_image_grid.save(
+            f'{self.marked_uuid}.jpg',
+            ContentFile(marked_exam_nparray.tobytes())
+        )
+
+        _, graded_exam_nparray = cv.imencode('.jpg', exam_parser.img)
         self.exam_image_graded.delete()
         self.exam_image_graded.save(
-            f'{self.file_uuid}.jpg',
+            f'{self.graded_uuid}.jpg',
             ContentFile(graded_exam_nparray.tobytes())
         )
         
@@ -158,7 +172,8 @@ class Exam(models.Model):
     
 
     def __str__(self):
-        return self.name
+        student = Student.objects.filter(exam=self).first()
+        return student.name if student is not None else 'Unassigned'
 
 # @receiver(pre_save, sender=Exam)
 # def grade_exam(sender, instance: Exam, **kwargs):

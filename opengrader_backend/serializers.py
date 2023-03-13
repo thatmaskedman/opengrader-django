@@ -35,20 +35,18 @@ class StudentSerializer(serializers.ModelSerializer):
 
 class GradedExamSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
-
     class Meta:
         model = Exam
         fields = (
             'id',
-            'questions',
-            'exam_group',
-            'exam_image_original',
-            'exam_image_graded',
             'key_sheet',
             'student',
             'name',
-            'control_number',
-            'file_uuid',
+            'questions',
+            'exam_group',
+            'exam_image_original',
+            'exam_image_grid',
+            'exam_image_graded',
             'correct_answers',
             'wrong_answers',
             'grade',
@@ -82,7 +80,7 @@ class ChosenPandasSerializer(PandasSerializer):
 
 
 class ChosenDataFrameSerializer(serializers.ModelSerializer):
-    graded_exam = serializers.SlugRelatedField(read_only=True, slug_field='name')
+    graded_exam = serializers.StringRelatedField()
     class Meta:
         model = Question
         fields = (
@@ -93,7 +91,7 @@ class ChosenDataFrameSerializer(serializers.ModelSerializer):
 
 
 class QuestionDataFrameSerializer(serializers.ModelSerializer):
-    graded_exam = serializers.SlugRelatedField(read_only=True, slug_field='name')
+    graded_exam = serializers.StringRelatedField()
     class Meta:
         model = Question
         fields = (
