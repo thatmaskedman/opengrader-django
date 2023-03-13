@@ -41,7 +41,6 @@ class GradedExamSerializer(serializers.ModelSerializer):
             'id',
             'key_sheet',
             'student',
-            'name',
             'questions',
             'exam_group',
             'exam_image_original',
