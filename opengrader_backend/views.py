@@ -54,7 +54,7 @@ class GradedExamViewSet(viewsets.ModelViewSet):
         queryset = Exam.objects.all()
         examgroup_pk = self.request.query_params.get('examgroup')
         if examgroup_pk is not None:
-            examgroup = ExamGroup.objects.get(pk=examgroup_pk)
+            examgroup = ExamGroup.objects.filter(pk=examgroup_pk).first()
             queryset = queryset.filter(exam_group=examgroup)
         
         return queryset
@@ -62,8 +62,6 @@ class GradedExamViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        
-
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -108,11 +106,43 @@ class KeySheetViewSet(viewsets.ModelViewSet):
         queryset = KeySheet.objects.all()
         examgroup_pk = self.request.query_params.get('examgroup')
         if examgroup_pk is not None:
-            examgroup = ExamGroup.objects.get(pk=examgroup_pk)
+            examgroup = ExamGroup.objects.filter(pk=examgroup_pk).first()
             queryset = queryset.filter(exam_group=examgroup)
         
         return queryset
     
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        
+        keysheet_id = serializer.data['id']
+        keysheet = KeySheet.objects.filter(id=keysheet_id).first()
+        
+        num_questions = \
+            ExamGroup.objects.filter(pk=keysheet.exam_group.id).first().num_questions
+        
+        KeyQuestion.objects.bulk_create([
+            KeyQuestion(number=n, key_sheet=keysheet, chosen='a')
+            for n in range(1, num_questions+1)
+        ])
+        
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+    # @action(detail=True, methods=['post'], name='Initialize Fields')
+    # def init(self, request, pk=None):
+    #     keysheet: KeySheet = self.get_object()
+    #     serializer: GradedExamSerializer = self.get_serializer()
+    #     headers = self.get_success_headers(serializer.data)
+
+    #     try: 
+    #         keysheet.initialize()
+    #         return Response(serializer.data, status=status.HTTP_202_ACCEPTED, headers=headers)
+        
+    #     except ValueError:
+    #         return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST, headers=headers)
+        
 
 class StudentViewSet(viewsets.ModelViewSet):
     """
