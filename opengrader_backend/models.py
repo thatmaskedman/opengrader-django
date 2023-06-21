@@ -92,6 +92,34 @@ class Exam(models.Model):
     is_graded = models.BooleanField(default=False)
     grade = models.FloatField(default=0.0,)
     
+    @staticmethod
+    def preview_boxes(img) -> io.BytesIO:
+        processor = document.DocumentProcessor(img.file)
+        processor.process()
+                
+        choice_points = processor.get_choice_points()
+        intensities = processor.get_intensities()
+
+        exam_parser = \
+            answersheet.AnswerSheet(
+                processor.img_scaled,
+                choice_points, 
+                thresholds=intensities,
+                question_count=1,
+            )
+        
+        exam_parser.set_keydata([{1:'a'}])
+        exam_parser.mark_choices()
+        exam_parser.set_data()
+        exam_parser.choose_answers()
+
+        exam_parser.mark_choices()
+
+        _, marked_exam_nparray = cv.imencode('.jpg', processor.img_scaled_marked_boxes)
+
+        return marked_exam_nparray.tobytes()
+    
+
     def parse_questions(self):
         exam_bytes = io.BytesIO(self.exam_image_original.open(mode='rb').read())
         processor = document.DocumentProcessor(exam_bytes)
