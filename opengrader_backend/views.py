@@ -1,11 +1,14 @@
 # from django.shortcuts import render
+import io
 import pandas as pd
 from .models import ExamGroup, Exam, KeyQuestion, KeySheet, Question, Student
 from rest_pandas import PandasView
 from rest_framework import viewsets
 from rest_framework import views
+from rest_framework import renderers
+
 from rest_framework.decorators import parser_classes
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, FileUploadParser
 # from rest_framework import permissions
 # from rest_framework import generics
 from rest_framework.response import Response
@@ -78,7 +81,7 @@ class GradedExamViewSet(viewsets.ModelViewSet):
         
         except ValueError:
             return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST, headers=headers)
-         
+    
 
 class QuestionExamViewSet(viewsets.ModelViewSet):
     """
@@ -204,6 +207,28 @@ class GradedDataView(PandasView):
     serializer_class = QuestionDataFrameSerializer
     pandas_serializer_class = GradePandasSerializer
 
+
+class JPEGRenderer(renderers.BaseRenderer):
+    media_type = 'image/jpeg'
+    format = 'jpg'
+    charset = None
+    render_style = 'binary'
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        return data
+
+class PreviewView(views.APIView):
+    parser_classes = [MultiPartParser]
+    renderer_classes = [JPEGRenderer]
+
+    def post(self, request, format='image/*'):
+        image = request.data['file']
+        try: 
+            image_preview = Exam.preview_boxes(image)
+            return Response(image_preview, status=status.HTTP_202_ACCEPTED, content_type='image/jpeg')
+        
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST) 
 
 class FileUploadView(views.APIView):
     parser_classes = [MultiPartParser]
