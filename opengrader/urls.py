@@ -36,6 +36,7 @@ router.register(r'students', views.StudentViewSet)
 urlpatterns = [
     path('api/', include(router.urls)),
     re_path('api/examdata/(?P<examgroup>.+)/$', views.ExamDataView.as_view()),
+    re_path('api/preview/$', views.PreviewView.as_view()),
     re_path('api/chosendata/(?P<examgroup>.+)/$', views.ChosenDataView.as_view()),
     re_path('api/gradedata/(?P<examgroup>.+)/$', views.GradedDataView.as_view()),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
