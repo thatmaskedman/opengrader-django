@@ -154,6 +154,15 @@ class StudentViewSet(viewsets.ModelViewSet):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
 
+    def get_queryset(self):
+        queryset = Student.objects.all()
+        examgroup_pk = self.request.query_params.get('examgroup')
+        if examgroup_pk is not None:
+            examgroup = ExamGroup.objects.filter(pk=examgroup_pk).first()
+            queryset = queryset.filter(exam_group=examgroup)
+        
+        return queryset
+
 
 class KeyQuestionViewSet(viewsets.ModelViewSet):
     """
@@ -182,6 +191,7 @@ class ExamDataView(PandasView):
     serializer_class = QuestionDataFrameSerializer
     pandas_serializer_class = QuestionPandasSerializer
 
+
 class ChosenDataView(PandasView):
     queryset = Question.objects.none()
 
@@ -194,6 +204,7 @@ class ChosenDataView(PandasView):
 
     serializer_class = ChosenDataFrameSerializer
     pandas_serializer_class = ChosenPandasSerializer
+
 
 class GradedDataView(PandasView):
     queryset = Question.objects.none()
@@ -217,6 +228,7 @@ class JPEGRenderer(renderers.BaseRenderer):
     def render(self, data, accepted_media_type=None, renderer_context=None):
         return data
 
+
 class PreviewView(views.APIView):
     parser_classes = [MultiPartParser]
     renderer_classes = [JPEGRenderer]
@@ -229,6 +241,7 @@ class PreviewView(views.APIView):
         
         except ValueError:
             return Response(status=status.HTTP_400_BAD_REQUEST) 
+
 
 class FileUploadView(views.APIView):
     parser_classes = [MultiPartParser]
