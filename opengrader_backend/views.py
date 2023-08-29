@@ -110,7 +110,7 @@ class KeySheetViewSet(viewsets.ModelViewSet):
         examgroup_pk = self.request.query_params.get('examgroup')
         if examgroup_pk is not None:
             examgroup = ExamGroup.objects.filter(pk=examgroup_pk).first()
-            queryset = queryset.filter(exam_group=examgroup)
+            queryset = queryset.filter(exam_group=examgroup).order_by('key_class')
         
         return queryset
     
